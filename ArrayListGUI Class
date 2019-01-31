@@ -1,0 +1,236 @@
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+
+public class ArrayListGUI extends JFrame{
+	ArrayList<Integer> list = new ArrayList<>();
+	JButton add, remove, find, sort;
+	JTextField text1;
+	
+	JTable table;
+	JScrollPane scroll;
+	
+	public ArrayListGUI() {
+		
+		setSize(1700,1000);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
+		//Title Label
+		JLabel title = new JLabel("ArrayList!!");
+		c.fill = GridBagConstraints.HORIZONTAL;
+		title.setFont(title.getFont().deriveFont(26.0f));
+		c.gridwidth = 2;
+		c.weighty = 0.8;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.insets = new Insets(0, 0, 0, 0);
+		add(title, c);
+		
+		text1 = new JTextField(5);
+		text1.setFont(text1.getFont().deriveFont(24.0f));
+		c.fill = GridBagConstraints.CENTER;
+		c.gridwidth = 1;
+		c.weighty = 0.8;
+		c.gridx = 0;
+		c.gridy = 1;
+		c.insets = new Insets(0, 10, 0, 10);
+		add(text1, c);	
+		
+		add = new JButton("Add");
+		add.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					addToList(Integer.parseInt(text1.getText()), c);
+					
+				}
+				catch(Exception e) {
+					JOptionPane.showMessageDialog(null, "Error: Please enter an Integer");
+				}
+			}
+			
+		});
+		add.setFont(add.getFont().deriveFont(24.0f));
+		c.fill = GridBagConstraints.CENTER;
+		c.gridwidth = 1;
+		c.weighty = 0.8;
+		c.gridx = 1;
+		c.gridy = 1;
+		add(add, c);
+		
+		find = new JButton("Find");
+		find.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					finding(Integer.parseInt(text1.getText()), c);
+					
+				}
+				catch(Exception e) {
+					JOptionPane.showMessageDialog(null, "Error: Please enter an Integer");
+				}
+			}
+			
+		});
+		find.setFont(find.getFont().deriveFont(24.0f));
+		c.fill = GridBagConstraints.CENTER;
+		c.gridwidth = 1;
+		c.weighty = 0.8;
+		c.gridx = 2;
+		c.gridy = 1;
+		add(find, c);
+		
+		remove = new JButton("Remove All Instances");
+		remove.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					remove(Integer.parseInt(text1.getText()), c);
+					
+				}
+				catch(Exception e) {
+					JOptionPane.showMessageDialog(null, "Error: Please enter an Integer");
+				}
+			}
+			
+		});
+		remove.setFont(remove.getFont().deriveFont(24.0f));
+		c.fill = GridBagConstraints.CENTER;
+		c.gridwidth = 2;
+		c.weighty = 0.8;
+		c.gridx = 3;
+		c.gridy = 1;
+		add(remove, c);
+		
+		sort = new JButton("Sort");
+		sort.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				sort(c);
+			}
+			
+		});
+		sort.setFont(sort.getFont().deriveFont(24.0f));
+		c.fill = GridBagConstraints.CENTER;
+		c.gridwidth = 2;
+		c.weighty = 0.8;
+		c.gridx = 5;
+		c.gridy = 1;
+		add(sort, c);
+		
+		setVisible(true);
+		
+	}
+	
+	public void addToList(int num, GridBagConstraints c) {
+		list.add(num);
+		print(list,c,true);
+	}
+	
+	public void finding(int num, GridBagConstraints c) {
+		ArrayList<Integer> temp = new ArrayList<>();
+		for(int i = 0; i < list.size(); i++) {
+			if(list.get(i) == num) temp.add(i);
+		}
+		
+		print(temp,c,false);
+	}
+	
+	public void remove(int num, GridBagConstraints c) {
+		for(int i = 0 ; i < list.size(); i++) {
+			if(list.get(i) == num) {
+				list.remove(i);
+				i--;
+			}
+		}
+		
+		print(list,c,true);
+	}
+	
+	public void sort(GridBagConstraints c) {
+		int[] arr = new int[list.size()];
+		for(int i = 0; i < list.size(); i++) {
+			arr[i] = list.get(i);
+		}
+		for(int i = 0; i < arr.length; i++) {
+			//Go through the ints to the left of the "wall"
+			for(int j = i - 1; j >= 0; j--) {
+				//Keep swapping "wall" int until it larger than the int to the left
+				if(arr[j+1] < arr[j]) {
+					int temp = arr[j];
+					arr[j] = arr[j+1]; 
+					arr[j+1] = temp;
+				}
+			}
+		}
+		ArrayList<Integer> temp = new ArrayList<>();
+		int prev = 0;
+		if(arr[0] == list.get(0)) temp.add(0);
+		for(int i =0; i < list.size(); i++) {
+			for(int j = 0; j < list.size(); j++) {
+				if(arr[i] == list.get(j) && (list.get(j) != list.get(prev) || j > prev)) {
+					temp.add(j);
+					prev = j;
+					break;
+				}
+			}
+		}
+		print(temp,c,false);
+	}
+	
+	public void print(ArrayList<Integer> x, GridBagConstraints c, boolean all) {
+		try {
+			remove(table);
+			remove(scroll);
+		}
+		catch(Exception e) {
+		}
+		
+		//Make the column title
+		String[] column = {"Index", "Number"};
+		//Add the list of students
+		int amountOfNum = x.size();
+		Object[][] list2D = new Object[amountOfNum][2];
+		if(all) {
+			for(int i = 0; i < amountOfNum; i++) {
+				list2D[i][0] = i;
+				list2D[i][1] = x.get(i);
+			}
+		}
+		else {
+			for(int i = 0; i < amountOfNum; i++) {
+				list2D[i][0] = x.get(i);
+				list2D[i][1] = list.get(x.get(i));
+			}
+		}
+		
+		//Make the table
+		table = new JTable(list2D, column);
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( SwingConstants.CENTER );
+		table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+		table.setFont(table.getFont().deriveFont(20.0f));
+		table.setRowHeight(30);
+		table.setAutoCreateRowSorter(true);
+		scroll  = new JScrollPane(table);
+		c.fill = GridBagConstraints.CENTER;
+		c.gridwidth = 5;
+		c.ipady = 300;
+		c.ipadx = 300;
+		c.gridheight = 3;
+		c.gridx = 0;
+		c.gridy = 3;
+		add(scroll, c);
+		setVisible(true);
+	}
+}
